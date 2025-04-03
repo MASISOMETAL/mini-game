@@ -1,0 +1,169 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.header {
+  padding: 2rem 0;
+  text-align: center;
+}
+
+.title {
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+  color: #333;
+}
+
+.playerInfo {
+  font-size: 1.2rem;
+  color: #666;
+}
+
+.main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 0;
+  gap: 2rem;
+}
+
+.gameInfo {
+  background-color: #f9f9f9;
+  padding: 2rem;
+  border-radius: 8px;
+  text-align: center;
+  max-width: 600px;
+  width: 100%;
+}
+
+.gameInfo h2 {
+  margin-bottom: 1rem;
+  color: #333;
+}
+
+.gameInfo p {
+  margin-bottom: 0.5rem;
+  color: #666;
+}
+
+.backButton {
+  padding: 0.75rem 1.5rem;
+  background-color: #0070f3;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  text-decoration: none;
+}
+
+.backButton:hover {
+  background-color: #0060df;
+}
+
+.playersSection {
+  display: flex;
+  flex-direction: row;
+  width: 80%;
+  max-width: 1200px;
+  gap: 20px;
+}
+
+.leftSection {
+  flex: 1;
+  border: 2px solid #4caf50;
+  border-radius: 10px;
+  padding: 16px;
+  background-color: #f9f9f9;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.leftSection h3 {
+  color: #4caf50;
+  font-size: 18px;
+  margin-bottom: 12px;
+}
+
+.playerList {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.playerItem {
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 8px;
+  margin-bottom: 8px;
+  text-align: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.rightSection {
+  flex: 2;
+  border: 2px solid #3f51b5;
+  border-radius: 10px;
+  padding: 16px;
+  background-color: #f0f4ff;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.rightSection h3 {
+  color: #3f51b5;
+  font-size: 18px;
+  margin-bottom: 12px;
+}
+
+.chatBox {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.chatMessages {
+  list-style-type: none;
+  padding: 0;
+  min-height: 200px;
+  max-height: 400px;
+  overflow-y: auto;
+  background-color: #ffffff;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.chatMessage {
+  padding: 6px;
+  border-bottom: 1px solid #eee;
+}
+
+.chatInput {
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  width: 100%;
+}
+
+.sendButton {
+  padding: 8px 12px;
+  border: none;
+  border-radius: 6px;
+  background-color: #3f51b5;
+  color: white;
+  cursor: pointer;
+}
+
+.sendButton:hover {
+  background-color: #303f9f;
+}
+
