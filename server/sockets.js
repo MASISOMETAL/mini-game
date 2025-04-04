@@ -32,16 +32,18 @@ const socketApi = (socket, io, db) => {
         io.to(socket.roomCode).emit("response fetch data", row)
       })
     }
+
+    if (socket.isHost) {
+      db.run(`DELETE FROM games WHERE codeId == ?`, [socket.roomCode], (err) => {
+        if (err) {
+          console.error("Error al eliminar el jugador:", err.message);
+          return;
+        }
+      })
+    }
   });
 
-  if (socket.isHost) {
-    db.run(`DELETE FROM games WHERE codeId == ?`, [socket.roomCode], (err) => {
-      if (err) {
-        console.error("Error al eliminar el jugador:", err.message);
-        return;
-      }
-    })
-  }
+
 }
 
 module.exports = socketApi
@@ -92,6 +94,6 @@ const fetchData = (db, socket, roomId, io, idUserR, isHostR) => {
 }
 //msg
 const chatGroup = (data, io) => {
-  const { name, msg, roomId} = data
+  const { name, msg, roomId } = data
   io.to(roomId).emit("response msg", data)
 }
