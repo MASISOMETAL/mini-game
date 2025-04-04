@@ -18,6 +18,7 @@ const page = () => {
 
 const PageComponent = () => {
   const socketRef = useRef(null)
+  const colorMap = useRef({})
   const [codeRoom, setCodeRoom] = useState("")
   const [hostName, setHostName] = useState("")
   const [idUser, setidUser] = useState(0)
@@ -26,13 +27,25 @@ const PageComponent = () => {
   const [players, setPlayers] = useState([])
   const [inputMsg, setinputMsg] = useState("")
   const [chatGroup, setChatGroup] = useState([])
-  const [colorText, setColorText] = useState(obtenerColorRandom())
 
   const roomId = useSelector(state => state.game.codeGame)
   const hostNameR = useSelector(state => state.game.hostName)
   const isStartR = useSelector(state => state.game.isStart)
   const idUserR = useSelector(state => state.game.id)
   const isHostR = useSelector(state => state.game.isHost)
+
+  const obtenerColorUnico = (name) => {
+    if (!colorMap.current[name]) {
+      const letras = '0123456789ABCDEF';
+      let color = '#';
+      for (let i = 0; i < 6; i++) {
+        color += letras[Math.floor(Math.random() * 16)];
+      }
+      colorMap.current[name] = color;
+    }
+    return colorMap.current[name];
+  };
+  
 
   useEffect(() => {
     socketRef.current = io()
@@ -51,7 +64,7 @@ const PageComponent = () => {
     })
 
     socketRef.current.on("response msg", (data) => {
-      setChatGroup(prev => [...prev, data])
+      setChatGroup(prev => [...prev, {...data, color: obtenerColorUnico(data.name)}])
     })
 
     return () => {
@@ -64,15 +77,6 @@ const PageComponent = () => {
     setinputMsg("")
   }
 
-  function obtenerColorRandom() {
-    const letras = '0123456789ABCDEF';
-    let color = '#';
-    for (let i = 0; i < 6; i++) {
-      color += letras[Math.floor(Math.random() * 16)];
-    }
-    return { color };
-  }
-  
   return (
     <div className={styles.container}>
       <header className={styles.header}>
@@ -98,7 +102,7 @@ const PageComponent = () => {
             <div className={styles.chatBox}>
               <ul className={styles.chatMessages}>
                 {chatGroup.map((msg, index) => (
-                  <li key={index} className={styles.chatMessage}><span style={colorText}>{msg.name}</span>: {msg.msg}</li>
+                  <li key={index} className={styles.chatMessage}><span style={{color: msg.color}}>{msg.name}</span>: {msg.msg}</li>
                 ))}
               </ul>
               <input

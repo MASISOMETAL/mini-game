@@ -167,3 +167,8 @@
   background-color: #303f9f;
 }
 
+@media (max-width: 768px) {
+  .playersSection {
+    flex-direction: column;
+  }
+}
