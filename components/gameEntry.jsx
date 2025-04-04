@@ -21,7 +21,7 @@ const GameEntry = () => {
   const dispatch = useDispatch()
 
   useEffect(() => {
-    socketRef.current = io("http://localhost:3000")
+    socketRef.current = io()
 
     return () => socketRef.current.disconnect()
   }, [])

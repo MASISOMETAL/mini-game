@@ -35,7 +35,7 @@ const PageComponent = () => {
   const isHostR = useSelector(state => state.game.isHost)
 
   useEffect(() => {
-    socketRef.current = io("http://localhost:3000")
+    socketRef.current = io()
 
     socketRef.current.emit("fetch data", roomId, idUserR, isHostR)
     socketRef.current.on("response fetch data", (data) => {
