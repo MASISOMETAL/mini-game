@@ -33,25 +33,6 @@
   gap: 2rem;
 }
 
-.gameInfo {
-  background-color: #f9f9f9;
-  padding: 2rem;
-  border-radius: 8px;
-  text-align: center;
-  max-width: 600px;
-  width: 100%;
-}
-
-.gameInfo h2 {
-  margin-bottom: 1rem;
-  color: #333;
-}
-
-.gameInfo p {
-  margin-bottom: 0.5rem;
-  color: #666;
-}
-
 .backButton {
   padding: 0.75rem 1.5rem;
   background-color: #0070f3;
@@ -133,7 +114,7 @@
   list-style-type: none;
   padding: 0;
   min-height: 200px;
-  max-height: 400px;
+  max-height: 200px;
   overflow-y: auto;
   background-color: #ffffff;
   border: 1px solid #ddd;
@@ -165,6 +146,16 @@
 
 .sendButton:hover {
   background-color: #303f9f;
+}
+
+.containerForm {
+  display: flex;
+  gap: 1rem;
+}
+
+.btnHandler {
+  display: flex;
+  gap: 1rem;
 }
 
 @media (max-width: 768px) {

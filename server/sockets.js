@@ -14,6 +14,8 @@ const socketApi = (socket, io, db) => {
 
   socket.on("msg", (data) => chatGroup(data, io))
 
+  socket.on("game start", (data) => gameStart(data, db, socket, io))
+
   socket.on('disconnect', () => {
     console.log('user disconnected');
 
@@ -40,6 +42,7 @@ const socketApi = (socket, io, db) => {
           return;
         }
       })
+      io.to(socket.roomCode).emit("close room", false)
     }
   });
 
@@ -96,4 +99,10 @@ const fetchData = (db, socket, roomId, io, idUserR, isHostR) => {
 const chatGroup = (data, io) => {
   const { name, msg, roomId } = data
   io.to(roomId).emit("response msg", data)
+}
+
+const gameStart = (data, db, socket, io) => {
+  if (!data) return
+  db.run(`UPDATE games SET isStart = 1 WHERE codeId = ?`, [data])
+  io.to(data).emit("response game start", true)
 }

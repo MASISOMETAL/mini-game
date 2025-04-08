@@ -6,6 +6,9 @@ import Link from "next/link"
 import { useEffect, useRef, useState } from "react"
 import { useSelector } from "react-redux"
 import { io } from "socket.io-client";
+import sigotoInit from "../../../dataGame/sigoto.json"
+import situationInit from "../../../dataGame/situation.json"
+import { roundSelection } from "../../../lib/utils"
 
 const page = () => {
   return (
@@ -19,18 +22,21 @@ const page = () => {
 const PageComponent = () => {
   const socketRef = useRef(null)
   const colorMap = useRef({})
-  const [codeRoom, setCodeRoom] = useState("")
-  const [hostName, setHostName] = useState("")
-  const [idUser, setidUser] = useState(0)
-  const [isHost, setIsHost] = useState(false)
+  const chatBoxRef = useRef(null)
+
+  const [isHost, setIsHost] = useState(true)
   const [isStart, setIsStart] = useState(false)
   const [players, setPlayers] = useState([])
   const [inputMsg, setinputMsg] = useState("")
   const [chatGroup, setChatGroup] = useState([])
+// juego iniciado
+const [sigotos, setSigotos] = useState(sigotoInit)
+const [sigotosSelected, setSigotosSelected] = useState([])
+const [situation, setSituation] = useState(situationInit)
+const [situationSelected, setSituationSelected] = useState({})
 
   const roomId = useSelector(state => state.game.codeGame)
   const hostNameR = useSelector(state => state.game.hostName)
-  const isStartR = useSelector(state => state.game.isStart)
   const idUserR = useSelector(state => state.game.id)
   const isHostR = useSelector(state => state.game.isHost)
 
@@ -45,91 +51,125 @@ const PageComponent = () => {
     }
     return colorMap.current[name];
   };
-  
+
 
   useEffect(() => {
     socketRef.current = io()
 
     socketRef.current.emit("fetch data", roomId, idUserR, isHostR)
-    socketRef.current.on("response fetch data", (data) => {
-      console.log(data);
-
-      setCodeRoom(roomId)
-      setHostName(hostNameR)
-      setIsHost(isHostR)
-      setidUser(idUserR)
-      setIsStart(isStartR)
-      setPlayers(data)
-
-    })
+    socketRef.current.on("response fetch data", (data) => setPlayers(data))
 
     socketRef.current.on("response msg", (data) => {
-      setChatGroup(prev => [...prev, {...data, color: obtenerColorUnico(data.name)}])
+      setChatGroup(prev => [...prev, { ...data, color: obtenerColorUnico(data.name) }])
     })
+
+    socketRef.current.on("close room", (info) => setIsHost(info))
+
+    socketRef.current.on("response game start", (isStart) => setIsStart(isStart))
+
 
     return () => {
       socketRef.current.disconnect()
     }
   }, [])
 
+  useEffect(() => {
+    if (chatBoxRef.current) {
+      chatBoxRef.current.scrollTop = chatBoxRef.current.scrollHeight;
+    }
+  }, [chatGroup])
+
   const sendMsg = () => {
+    if (!inputMsg.trim()) return
     socketRef.current.emit("msg", { name: hostNameR, msg: inputMsg, roomId: roomId })
     setinputMsg("")
   }
 
+  const startGame = () => {
+    socketRef.current.emit("game start", roomId)
+    setIsStart(true)
+  }
+
+  const activacion = () => {
+    roundSelection(sigotos, setSigotos, setSigotosSelected, situation, setSituation, setSituationSelected)
+  }
+
+  if (!isHost) {
+    return (
+      <div className={styles.container}>
+        <h1 className={styles.title}>La sala a la que intentaste entrar no existe o se ha cerrado</h1>
+      </div>
+    )
+  }
+
   return (
-    <div className={styles.container}>
-      <header className={styles.header}>
-        <h1 className={styles.title}>Game Room: {codeRoom}</h1>
-        <p className={styles.playerInfo}>Playing as: {hostName}</p>
-      </header>
+    <>
+      {!isStart ?
+        <div className={styles.container}>
+          <header className={styles.header}>
+            <h1 className={styles.title}>Código de invitación: {roomId}</h1>
+            <p className={styles.playerInfo}>Jugando como: {hostNameR}</p>
+          </header>
 
-      <main className={styles.main}>
-        <div className={styles.playersSection}>
-          <div className={styles.leftSection}>
-            <h3>Players:</h3>
-            <ul className={styles.playerList}>
-              {players.map((player) => (
-                <li key={player.playerId} className={styles.playerItem}>
-                  Jugador {player.player}
-                </li>
-              ))}
-            </ul>
-          </div>
+          <main className={styles.main}>
+            <div className={styles.playersSection}>
+              <div className={styles.leftSection}>
+                <h3>Jugadores:</h3>
+                <ul className={styles.playerList}>
+                  {players.map((player) => (
+                    <li key={player.playerId} className={styles.playerItem}>
+                      {player.player}
+                    </li>
+                  ))}
+                </ul>
+              </div>
 
-          <div className={styles.rightSection}>
-            <h3>Chat:</h3>
-            <div className={styles.chatBox}>
-              <ul className={styles.chatMessages}>
-                {chatGroup.map((msg, index) => (
-                  <li key={index} className={styles.chatMessage}><span style={{color: msg.color}}>{msg.name}</span>: {msg.msg}</li>
-                ))}
-              </ul>
-              <input
-                type="text"
-                placeholder="Escribe tu mensaje..."
-                className={styles.chatInput}
-                onChange={(e) => setinputMsg(e.target.value)}
-                value={inputMsg}
-              />
-              <button className={styles.sendButton} onClick={sendMsg}>Enviar</button>
+              <div className={styles.rightSection}>
+                <h3>Chat:</h3>
+                <div className={styles.chatBox}>
+                  <ul className={styles.chatMessages} ref={chatBoxRef}>
+                    {chatGroup.map((msg, index) => (
+                      <li key={index} className={styles.chatMessage}><span style={{ color: msg.color }}>{msg.name}</span>: {msg.msg}</li>
+                    ))}
+                  </ul>
+                  <form onSubmit={(e) => { e.preventDefault(); sendMsg(); }} className={styles.containerForm}>
+                    <input
+                      type="text"
+                      placeholder="Escribe tu mensaje..."
+                      className={styles.chatInput}
+                      onChange={(e) => setinputMsg(e.target.value)}
+                      value={inputMsg}
+                    />
+                    <button className={styles.sendButton} type="submit">Enviar</button>
+                  </form>
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
 
-        <div className={styles.gameInfo}>
-          <h2>Game Room Created!</h2>
-          <p>
-            Share this code with your friends: <strong>{codeRoom}</strong>
-          </p>
-          <p>This is a placeholder for the actual game content.</p>
+            <div className={styles.btnHandler}>
+              <Link href="/" className={styles.backButton}>
+                Salir
+              </Link>
+              {isHostR ? <button className={styles.backButton} onClick={startGame}>
+                Iniciar
+              </button> : null}
+            </div>
+          </main>
         </div>
-
-        <Link href="/" className={styles.backButton}>
-          Back to Home
-        </Link>
-      </main>
-    </div>
+        :
+        <div className={styles.container}>
+          <h2>Sigotos</h2>
+          {sigotosSelected && sigotosSelected.map((item, index) => 
+            <div key={index}>
+              <p>{item.name}</p>
+            </div>
+          )}
+          <h2>Situacion</h2>
+          <p>{situationSelected.situation}</p>
+          <button onClick={activacion}>Activar</button>
+        </div>
+      }
+    </>
   )
 }
 

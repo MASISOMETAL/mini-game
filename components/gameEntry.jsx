@@ -14,7 +14,7 @@ const GameEntry = () => {
   const [activeTab, setActiveTab] = useState("create")
   const [playerName, setPlayerName] = useState("")
   const [roomCode, setRoomCode] = useState("")
-  const [codeError, setCodeError] = useState(false)
+  const [codeError, setCodeError] = useState("")
   const [btnBlock, setBtnBlock] = useState(false)
   const socketRef = useRef(null)
 
@@ -40,7 +40,7 @@ const GameEntry = () => {
       isHost: 1,
       isStart: 0
     }
-    
+
     dispatch(setCode(data))
 
     socketRef.current.emit("create", data)
@@ -64,11 +64,17 @@ const GameEntry = () => {
     socketRef.current.emit("join", roomCode)
 
     socketRef.current.on("response join", (response) => {
+      console.log(response);
+      
       if (response.length) {
-        socketRef.current.emit("join ok", data)
-        router.push(`/game/${roomCode}`)
+        if (response[0].isStart == 1) {
+          setCodeError("El juego ya fue iniciado")
+        } else {
+          socketRef.current.emit("join ok", data)
+          router.push(`/game/${roomCode}`)
+        }
       } else {
-        setCodeError(true)       
+        setCodeError("El codigo es incorrecto")
       }
     })
   }
@@ -80,13 +86,13 @@ const GameEntry = () => {
           className={`${styles.tab} ${activeTab === "create" ? styles.active : ""}`}
           onClick={() => setActiveTab("create")}
         >
-          Create Game
+          Crear Juego
         </button>
         <button
           className={`${styles.tab} ${activeTab === "join" ? styles.active : ""}`}
           onClick={() => setActiveTab("join")}
         >
-          Join Game
+          Unirte a Juego
         </button>
       </div>
 
@@ -95,7 +101,7 @@ const GameEntry = () => {
           <form onSubmit={handleCreateGame} className={styles.form}>
             <div className={styles.formGroup}>
               <label htmlFor="create-name" className={styles.label}>
-                Your Name
+                Tu Nombre
               </label>
               <input
                 id="create-name"
@@ -103,20 +109,20 @@ const GameEntry = () => {
                 value={playerName}
                 onChange={(e) => setPlayerName(e.target.value)}
                 className={styles.input}
-                placeholder="Enter your name"
+                placeholder="Ingresa tu nombre..."
                 required
               />
             </div>
 
             <button type="submit" className={styles.button} disabled={btnBlock}>
-              Create Room
+              Crear Juego
             </button>
           </form>
         ) : (
           <form onSubmit={handleJoinGame} className={styles.form}>
             <div className={styles.formGroup}>
               <label htmlFor="join-name" className={styles.label}>
-                Your Name
+                Tu Nombre
               </label>
               <input
                 id="join-name"
@@ -124,14 +130,14 @@ const GameEntry = () => {
                 value={playerName}
                 onChange={(e) => setPlayerName(e.target.value)}
                 className={styles.input}
-                placeholder="Enter your name"
+                placeholder="Ingresa tu nombre..."
                 required
               />
             </div>
 
             <div className={styles.formGroup}>
               <label htmlFor="room-code" className={styles.label}>
-                Room Code
+                Codigo
               </label>
               <input
                 id="room-code"
@@ -139,15 +145,15 @@ const GameEntry = () => {
                 value={roomCode}
                 onChange={(e) => setRoomCode(e.target.value.toUpperCase())}
                 className={styles.input}
-                placeholder="Enter room code"
+                placeholder="Ingrese el codigo de invitación"
                 maxLength={6}
                 required
               />
-              {codeError && <p className={styles.textError}>El codigo es incorrecto</p>}
+              {codeError && <p className={styles.textError}>{codeError}</p>}
             </div>
 
             <button type="submit" className={styles.button}>
-              Join Room
+              Unirse al juego
             </button>
           </form>
         )}

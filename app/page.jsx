@@ -7,8 +7,8 @@ const page = () => {
     <ReduxProvider>
       <div className={styles.container}>
         <header className={styles.header}>
-          <h1 className={styles.title}>Game Room</h1>
-          <p className={styles.description}>Create or join a game room to start playing</p>
+          <h1 className={styles.title}>Bienvenido a "El Juego"</h1>
+          <p className={styles.description}>Crea una partida o unite a una!</p>
         </header>
 
         <main className={styles.main}>
