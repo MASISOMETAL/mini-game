@@ -29,11 +29,11 @@ const PageComponent = () => {
   const [players, setPlayers] = useState([])
   const [inputMsg, setinputMsg] = useState("")
   const [chatGroup, setChatGroup] = useState([])
-// juego iniciado
-const [sigotos, setSigotos] = useState(sigotoInit)
-const [sigotosSelected, setSigotosSelected] = useState([])
-const [situation, setSituation] = useState(situationInit)
-const [situationSelected, setSituationSelected] = useState({})
+  // juego iniciado
+  const [sigotos, setSigotos] = useState(sigotoInit)
+  const [sigotosSelected, setSigotosSelected] = useState([])
+  const [situation, setSituation] = useState(situationInit)
+  const [situationSelected, setSituationSelected] = useState({})
 
   const roomId = useSelector(state => state.game.codeGame)
   const hostNameR = useSelector(state => state.game.hostName)
@@ -159,11 +159,14 @@ const [situationSelected, setSituationSelected] = useState({})
         :
         <div className={styles.container}>
           <h2>Sigotos</h2>
-          {sigotosSelected && sigotosSelected.map((item, index) => 
-            <div key={index}>
-              <p>{item.name}</p>
-            </div>
-          )}
+          <div className={styles.containerCard}>
+            {sigotosSelected && sigotosSelected.map((item, index) =>
+              <div key={index} className={styles.card}>
+                <img src={item.image} alt={item.name} width={100} height={100} />
+                <p>{item.name}</p>
+              </div>
+            )}
+          </div>
           <h2>Situacion</h2>
           <p>{situationSelected.situation}</p>
           <button onClick={activacion}>Activar</button>

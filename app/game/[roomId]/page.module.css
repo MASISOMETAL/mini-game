@@ -157,6 +157,16 @@
   display: flex;
   gap: 1rem;
 }
+/* posible a borrar */
+.containerCard {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.card {
+  flex: 0 0 auto;
+  width: 18vw;
+}
 
 @media (max-width: 768px) {
   .playersSection {

@@ -8,7 +8,7 @@ const socketApi = require("./sockets.js");
 const io = new Server(server)
 const sqlite3 = require('sqlite3').verbose();
 
-const nextApp = next({ dev: false })
+const nextApp = next({ dev: true })
 const handle = nextApp.getRequestHandler()
 const db = new sqlite3.Database('./database/game');
 
