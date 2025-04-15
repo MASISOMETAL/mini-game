@@ -11,8 +11,8 @@ import situationInit from "../../../dataGame/situation.json"
 import { roundSelection } from "../../../lib/utils"
 import { setCode, startGameState } from "../../../store/features/game"
 import EnterName from "../../../components/enterName"
+import GameInterface from "../../../components/gameInterface"
 import { v4 as uuidv4 } from 'uuid'
-import Image from "next/image"
 
 const page = () => {
 
@@ -38,9 +38,9 @@ const PageComponent = () => {
   const [chatGroup, setChatGroup] = useState([])
   // juego iniciado
   const [sigotos, setSigotos] = useState(sigotoInit)
-  const [sigotosSelected, setSigotosSelected] = useState([])
+  const [sigotosSelected, setSigotosSelected] = useState(null)
   const [situation, setSituation] = useState(situationInit)
-  const [situationSelected, setSituationSelected] = useState({})
+  const [situationSelected, setSituationSelected] = useState(null)
 
   const { codeGame, userName, idUser, isHost, isStart } = useSelector(state => state.game)
 
@@ -71,7 +71,14 @@ const PageComponent = () => {
     // se ejecuta en caso de que el socket cierre el juego
     socketRef.current.on("close room", (info) => setGameOpen(info))
 
-    socketRef.current.on("response game start", (isStart) => dispatch(startGameState(isStart)))
+    // se inicia el juego
+    socketRef.current.on("response game start", (data) => {
+      if (!isHost) {
+        setSigotosSelected(data.sigotosSelected)
+        setSituationSelected(data.situationSelected)
+      }
+      dispatch(startGameState(data.start))
+    })
 
     return () => {
       socketRef.current.disconnect()
@@ -89,6 +96,17 @@ const PageComponent = () => {
       chatBoxRef.current.scrollTop = chatBoxRef.current.scrollHeight;
     }
   }, [chatGroup])
+
+  useEffect(()=> {
+    if (sigotosSelected && situationSelected) {
+      const data = {
+        codeGame: codeGame,
+        sigotosSelected: sigotosSelected,
+        situationSelected: situationSelected
+      }
+      socketRef.current.emit("game start", data)
+    }
+  }, [sigotosSelected, situationSelected])
 
   const sendMsg = () => {
     if (!inputMsg.trim()) return
@@ -122,7 +140,6 @@ const PageComponent = () => {
   }
 
   const startGame = () => {
-    socketRef.current.emit("game start", codeGame)
     roundSelection(sigotos, setSigotos, setSigotosSelected, situation, setSituation, setSituationSelected)
   }
 
@@ -195,88 +212,11 @@ const PageComponent = () => {
           </main>
         </div>
         :
-        <main className={styles.main}>
-          <div className={styles.playersSection}>
-            <div className={styles.leftSection}>
-              <h3>Jugadores:</h3>
-              <ul className={styles.playerList}>
-                {players.map((player) => (
-                  <li key={player.idUser} className={styles.playerItem}>
-                    {player.userName}
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            <div className={styles.rightSection}>
-              <h3>Sigotos:</h3>
-
-              <div className={styles.tableContainer}>
-                <table className={styles.table}>
-                  <tbody>
-                    <tr>
-                      <td className={styles.cell}>1</td>
-                      <td className={styles.cell}>2</td>
-                      <td className={styles.cell}>3</td>
-                    </tr>
-                    <tr>
-                      <td className={styles.cell}>
-                        {sigotosSelected[0] && <img
-                          src={sigotosSelected[0].image}
-                          alt={sigotosSelected[0].name}
-                          className={styles.image}
-                        />}
-                      </td>
-                      <td className={styles.cell}>
-                      {sigotosSelected[1] && <img
-                          src={sigotosSelected[1].image}
-                          alt={sigotosSelected[1].name}
-                          className={styles.image}
-                        />}
-                      </td>
-                      <td className={styles.cell}>
-                      {sigotosSelected[2] && <img
-                          src={sigotosSelected[2].image}
-                          alt={sigotosSelected[2].name}
-                          className={styles.image}
-                        />}
-                      </td>
-                    </tr>
-                    <tr>
-                      <td className={styles.cell}>4</td>
-                      <td className={styles.cell}>5</td>
-                      <td className={styles.cell}>6</td>
-                    </tr>
-                    <tr>
-                      <td className={styles.cell}>
-                      {sigotosSelected[3] && <img
-                          src={sigotosSelected[3].image}
-                          alt={sigotosSelected[3].name}
-                          className={styles.image}
-                        />}
-                      </td>
-                      <td className={styles.cell}>
-                      {sigotosSelected[4] && <img
-                          src={sigotosSelected[4].image}
-                          alt={sigotosSelected[4].name}
-                          className={styles.image}
-                        />}
-                      </td>
-                      <td className={styles.cell}>
-                      {sigotosSelected[5] && <img
-                          src={sigotosSelected[5].image}
-                          alt={sigotosSelected[5].name}
-                          className={styles.image}
-                        />}
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-
-            </div>
-          </div>
-        </main>
+        <GameInterface
+          players={players}
+          sigotosSelected={sigotosSelected}
+          situationSelected={situationSelected}
+        />
       }
     </>
   )

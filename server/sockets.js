@@ -76,10 +76,12 @@ const chatGroup = (data, io) => {
   io.to(roomId).emit("response msg", data)
 }
 
-const gameStart = (codeGame, db, socket, io) => {
+const gameStart = (data, db, socket, io) => {
+  const {codeGame, sigotosSelected, situationSelected} = data
+  
   if (!codeGame) return
   db.run(`UPDATE games SET isStart = 1 WHERE codeId = ?`, [codeGame])
-  io.to(codeGame).emit("response game start", true)
+  io.to(codeGame).emit("response game start", {start: true, sigotosSelected, situationSelected})
 }
 
 const closeSocket = (socket, db, io) => {
