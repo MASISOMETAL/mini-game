@@ -1,11 +1,11 @@
 import { createSlice } from '@reduxjs/toolkit'
 
 const initialState = {
-  codeGame: "",
-  hostName: "",
+  codeGame: null,
+  userName: null,
+  idUser: null,
   isHost: null,
   isStart: null,
-  id: null
 }
 
 export const gameSlice = createSlice({
@@ -13,15 +13,18 @@ export const gameSlice = createSlice({
   initialState,
   reducers: {
     setCode: (state, { payload }) => {
-      state.codeGame = payload.codeId
-      state.hostName = payload.hostName
+      state.codeGame = payload.codeGame
+      state.userName = payload.userName
+      state.idUser = payload.idUser
       state.isHost = payload.isHost
       state.isStart = payload.isStart
-      state.id = payload.id
+    },
+    startGameState: (state, {payload}) => {
+      state.isStart = payload
     }
   }
 })
 
-export const { setCode } = gameSlice.actions
+export const { setCode, startGameState } = gameSlice.actions
 
 export default gameSlice.reducer

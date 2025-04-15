@@ -34,11 +34,11 @@ const GameEntry = () => {
     const newRoomCode = Math.random().toString(36).substring(2, 8).toUpperCase()
 
     const data = {
-      id: uuidv4().toString(),
-      codeId: newRoomCode,
-      hostName: playerName,
+      codeGame: newRoomCode,
+      userName: playerName,
+      idUser: uuidv4().toString(),
       isHost: 1,
-      isStart: 0
+      isStart: 0,
     }
 
     dispatch(setCode(data))
@@ -52,20 +52,18 @@ const GameEntry = () => {
     if (!playerName.trim() || !roomCode.trim()) return
 
     const data = {
-      id: uuidv4().toString(),
-      codeId: roomCode,
-      hostName: playerName,
+      idUser: uuidv4().toString(),
+      codeGame: roomCode,
+      userName: playerName,
       isHost: 0,
-      isStart: 0
+      isStart: 0,
     }
 
     dispatch(setCode(data))
 
     socketRef.current.emit("join", roomCode)
 
-    socketRef.current.on("response join", (response) => {
-      console.log(response);
-      
+    socketRef.current.on("response join", (response) => { 
       if (response.length) {
         if (response[0].isStart == 1) {
           setCodeError("El juego ya fue iniciado")
